@@ -16,7 +16,7 @@ class AdminScreen extends StatefulWidget {
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-  final AnnouncementController _controller = Get.put(AnnouncementController());
+  final AnnouncementController _controller = Get.find<AnnouncementController>();
   String _activeTab = 'pending'; // 'pending' or 'approved'
 
   @override
@@ -76,7 +76,9 @@ class _AdminScreenState extends State<AdminScreen> {
                                   ],
                                 ),
                                 if (isMobile) const SizedBox(height: 24),
-                                Row(
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
                                   children: [
                                     Obx(
                                       () => _StatCard(
@@ -92,7 +94,6 @@ class _AdminScreenState extends State<AdminScreen> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
                                     Obx(
                                       () => _StatCard(
                                         count: _controller
@@ -107,7 +108,6 @@ class _AdminScreenState extends State<AdminScreen> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
                                     Obx(
                                       () => _StatCard(
                                         count: _controller
@@ -198,8 +198,8 @@ class _AdminScreenState extends State<AdminScreen> {
                           final list = _activeTab == 'pending'
                               ? _controller.pendingRequests
                               : _activeTab == 'history'
-                                  ? _controller.historyAnnouncements
-                                  : _controller.approvedAnnouncements;
+                              ? _controller.historyAnnouncements
+                              : _controller.approvedAnnouncements;
 
                           if (list.isEmpty) {
                             return Center(
@@ -507,9 +507,10 @@ class _RequestTile extends StatelessWidget {
                 ],
               ),
               SizedBox(width: isMobile ? 0 : 24, height: isMobile ? 16 : 0),
-              Expanded(
-                child: Column(
+              if (isMobile)
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -537,7 +538,7 @@ class _RequestTile extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "SUBMITTED BY SYSTEM", // Or use userId if name was available
+                          "SUBMITTED BY SYSTEM",
                           style: AppTextStyles.label(
                             9,
                             color: AppColors.onSurfaceVariant,
@@ -561,15 +562,78 @@ class _RequestTile extends StatelessWidget {
                         14,
                         color: AppColors.onSurfaceVariant,
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
+                )
+              else
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
+                        runSpacing: 8,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: request.status == 'urgent'
+                                  ? AppColors.primary.withOpacity(0.1)
+                                  : AppColors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              request.category.toUpperCase(),
+                              style: AppTextStyles.label(
+                                9,
+                                color: AppColors.primary,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "SUBMITTED BY SYSTEM",
+                            style: AppTextStyles.label(
+                              9,
+                              color: AppColors.onSurfaceVariant,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        request.title,
+                        style: AppTextStyles.headline(
+                          24,
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        request.description,
+                        style: AppTextStyles.body(
+                          14,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               SizedBox(width: isMobile ? 0 : 24, height: isMobile ? 24 : 0),
               Flex(
-                direction: Axis.horizontal,
+                direction: isMobile ? Axis.vertical : Axis.horizontal,
+                crossAxisAlignment: isMobile
+                    ? CrossAxisAlignment.stretch
+                    : CrossAxisAlignment.center,
                 children: [
                   OutlinedButton.icon(
                     onPressed: onReject,
@@ -587,16 +651,22 @@ class _RequestTile extends StatelessWidget {
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.error,
-                      backgroundColor: AppColors.error.withOpacity(0.2),
+                      backgroundColor: AppColors.error.withOpacity(0.1),
                       side: BorderSide.none,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 16,
                       ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                   if (showActions) ...[
-                    const SizedBox(width: 12),
+                    SizedBox(
+                      width: isMobile ? 0 : 12,
+                      height: isMobile ? 12 : 0,
+                    ),
                     ElevatedButton.icon(
                       onPressed: onApprove,
                       icon: const Icon(
@@ -620,6 +690,9 @@ class _RequestTile extends StatelessWidget {
                           vertical: 16,
                         ),
                         elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ],
@@ -663,8 +736,8 @@ class _HistoryTile extends StatelessWidget {
           color: request.status == 'approved'
               ? AppColors.primary.withOpacity(0.5)
               : request.status == 'rejected' || request.status == 'removed'
-                  ? AppColors.error.withOpacity(0.5)
-                  : AppColors.outline.withOpacity(0.2),
+              ? AppColors.error.withOpacity(0.5)
+              : AppColors.outline.withOpacity(0.2),
         ),
       ),
       child: FutureBuilder<Map<String, dynamic>?>(
@@ -680,7 +753,10 @@ class _HistoryTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: request.status == 'approved'
                           ? AppColors.primary.withOpacity(0.2)
@@ -691,7 +767,9 @@ class _HistoryTile extends StatelessWidget {
                       request.status.toUpperCase(),
                       style: AppTextStyles.label(
                         10,
-                        color: request.status == 'approved' ? AppColors.primary : AppColors.error,
+                        color: request.status == 'approved'
+                            ? AppColors.primary
+                            : AppColors.error,
                         letterSpacing: 1.5,
                         weight: FontWeight.bold,
                       ),
@@ -699,7 +777,10 @@ class _HistoryTile extends StatelessWidget {
                   ),
                   Text(
                     "CREATED: ${request.createdAt.toString().split('.').first}",
-                    style: AppTextStyles.label(10, color: AppColors.onSurfaceVariant),
+                    style: AppTextStyles.label(
+                      10,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -718,25 +799,44 @@ class _HistoryTile extends StatelessWidget {
               const SizedBox(height: 16),
               _buildDetailRow("CATEGORY", request.category),
               const SizedBox(height: 8),
-              _buildDetailRow("LOCATION", request.location.isEmpty ? 'N/A' : request.location),
+              _buildDetailRow(
+                "LOCATION",
+                request.location.isEmpty ? 'N/A' : request.location,
+              ),
               const SizedBox(height: 8),
-              _buildDetailRow("DATE", request.eventDate.isEmpty ? 'N/A' : request.eventDate),
+              _buildDetailRow(
+                "DATE",
+                request.eventDate.isEmpty ? 'N/A' : request.eventDate,
+              ),
               const SizedBox(height: 8),
-              _buildDetailRow("TIME", request.eventTime.isEmpty ? 'N/A' : request.eventTime),
+              _buildDetailRow(
+                "TIME",
+                request.eventTime.isEmpty ? 'N/A' : request.eventTime,
+              ),
               const SizedBox(height: 16),
               Text(
                 "DESCRIPTION",
-                style: AppTextStyles.label(10, color: AppColors.onSurfaceVariant, letterSpacing: 1.5),
+                style: AppTextStyles.label(
+                  10,
+                  color: AppColors.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
-                request.description.isEmpty ? 'No description provided.' : request.description,
+                request.description.isEmpty
+                    ? 'No description provided.'
+                    : request.description,
                 style: AppTextStyles.body(14),
               ),
               const SizedBox(height: 16),
               Text(
                 "RULES / REQUIREMENTS",
-                style: AppTextStyles.label(10, color: AppColors.onSurfaceVariant, letterSpacing: 1.5),
+                style: AppTextStyles.label(
+                  10,
+                  color: AppColors.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -758,7 +858,11 @@ class _HistoryTile extends StatelessWidget {
           width: 100,
           child: Text(
             label,
-            style: AppTextStyles.label(10, color: AppColors.onSurfaceVariant, letterSpacing: 1.5),
+            style: AppTextStyles.label(
+              10,
+              color: AppColors.onSurfaceVariant,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         Expanded(

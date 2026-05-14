@@ -97,14 +97,21 @@ class _VotingArenaScreenState extends State<VotingArenaScreen> {
 
     try {
       debugPrint(
-        'Arena - Voting: Voter=${user.id}, Target=${targetProfile['id']}, Recognized=$isRecognized',
+        'Arena - Voting (Edge Function): Voter=${user.id}, Target=${targetProfile['id']}, Recognized=$isRecognized',
       );
-      await Supabase.instance.client.from('votes').upsert({
-        'voter_id': user.id,
-        'target_id': targetProfile['id'],
-        'is_recognized': isRecognized,
-      }, onConflict: 'voter_id,target_id');
-      debugPrint('Arena - Vote saved successfully');
+
+      final response = await Supabase.instance.client.functions.invoke(
+        'submit_vote',
+        body: {'target_id': targetProfile['id'], 'is_recognized': isRecognized},
+      );
+
+      if (response.status != 200) {
+        throw Exception(
+          'Function failed with status ${response.status}: ${response.data}',
+        );
+      }
+
+      debugPrint('Arena - Vote saved via Edge Function successfully');
       return true;
     } catch (e) {
       debugPrint('Error saving vote: $e');
@@ -141,9 +148,7 @@ class _VotingArenaScreenState extends State<VotingArenaScreen> {
                             _profiles.isEmpty
                                 ? _buildEmptyState()
                                 : _buildCardArena(),
-                            const SizedBox(
-                              height: 24,
-                            ), // Extra space for swipe buttons
+                            const SizedBox(height: 24),
                             const _SwipeInstructions(),
                             const SizedBox(height: 32),
                           ],
@@ -560,6 +565,7 @@ class _InstructionItem extends StatelessWidget {
     );
   }
 }
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 3D Infinite Cube Empty State
 // ─────────────────────────────────────────────────────────────────────────────
@@ -735,18 +741,13 @@ class _CubePainter extends CustomPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth =
-          3.0 // Made bolder
+      ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(
-        BlurStyle.solid,
-        1,
-      ); // Subtle glow flare
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1);
 
     final center = Offset(size.width / 2, size.height / 2);
     const double cubeSize = 60.0;
 
-    // 8 vertices of a cube
     List<Point3D> vertices = [
       Point3D(-1, -1, -1),
       Point3D(1, -1, -1),
@@ -789,7 +790,6 @@ class _CubePainter extends CustomPainter {
       projected.add(Offset(x * scale + center.dx, y * scale + center.dy));
     }
 
-    // Draw edges
     void drawEdge(int i, int j) =>
         canvas.drawLine(projected[i], projected[j], paint);
 
@@ -809,7 +809,6 @@ class _CubePainter extends CustomPainter {
     drawEdge(2, 6);
     drawEdge(3, 7);
 
-    // Add glow to vertices
     final vertexPaint = Paint()..color = color.withOpacity(0.5);
     for (var p in projected) {
       canvas.drawCircle(p, 2, vertexPaint);

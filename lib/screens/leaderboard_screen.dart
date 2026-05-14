@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:mainchar/routes/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
 import '../widgets/global_top_nav.dart';
@@ -19,7 +20,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   List<Map<String, dynamic>> _topUsers = [];
   bool _isLoading = true;
   Map<String, dynamic>? _currentUserProfile;
-  bool _isRevealHour = false;
+  bool _isRevealHour = true;  //for testing
   late Timer _timer;
   Duration _timeLeft = const Duration(days: 0);
 
@@ -54,11 +55,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
   Future<void> _fetchLeaderboard() async {
     try {
-      final response = await Supabase.instance.client
-          .from('users')
-          .select('*')
-          .order('username', ascending: true)
-          .limit(50);
+      // NEW: Using RPC for scalable, server-side sorted rankings
+      final response = await Supabase.instance.client.rpc(
+        'get_leaderboard',
+        params: {'limit_val': 50},
+      );
 
       if (mounted) {
         setState(() {
@@ -67,6 +68,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         });
       }
     } catch (e) {
+      debugPrint('Error fetching leaderboard: $e');
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -127,6 +129,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       child: Column(
                         children: [
                           _CountdownSection(timeLeft: _timeLeft),
+                          if (_isRevealHour)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: _LiveRevealCTA(
+                                onTap: () => Get.toNamed(AppRoutes.REVEAL_ARENA),
+                              ),
+                            ),
                           const SizedBox(height: 64),
                           if (_isLoading)
                             const Center(
@@ -868,6 +877,48 @@ class _FooterLink extends StatelessWidget {
         10,
         letterSpacing: 2.0,
         weight: FontWeight.bold,
+      ),
+    );
+  }
+}
+
+class _LiveRevealCTA extends StatelessWidget {
+  final VoidCallback onTap;
+  const _LiveRevealCTA({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+        decoration: BoxDecoration(
+          color: AppColors.secondary,
+          borderRadius: BorderRadius.circular(100),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.secondary.withOpacity(0.3),
+              blurRadius: 40,
+              spreadRadius: 10,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.play_circle_filled_rounded, color: Colors.black, size: 32),
+            const SizedBox(width: 16),
+            Text(
+              "ENTER REVEAL ARENA",
+              style: AppTextStyles.headline(20, color: Colors.black, weight: FontWeight.w900),
+            ),
+          ],
+        ),
+      ).animate(onPlay: (c) => c.repeat()).shimmer(duration: const Duration(seconds: 2)).scale(
+        begin: const Offset(1, 1),
+        end: const Offset(1.05, 1.05),
+        duration: const Duration(seconds: 1),
+        curve: Curves.easeInOut,
       ),
     );
   }

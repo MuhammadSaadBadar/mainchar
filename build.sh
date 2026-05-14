@@ -18,7 +18,7 @@ echo "Getting dependencies..."
 flutter pub get
 
 echo "Building web project..."
-flutter build web --release --base-href / \
+flutter build web --release --wasm --base-href / \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
 

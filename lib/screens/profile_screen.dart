@@ -133,35 +133,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_targetUserId == null) return;
 
     try {
-      // 1. Get current user's recognize count (already in _upvotesCount but let's be sure)
-      // 2. Count how many users have a strictly higher recognize count
-      final response = await Supabase.instance.client
-          .from('votes')
-          .select('target_id')
-          .eq('is_recognized', true);
+      // NEW: Using RPC for scalable server-side rank calculation
+      final response = await Supabase.instance.client.rpc(
+        'get_user_stats',
+        params: {'target_user_id': _targetUserId},
+      );
 
-      final List<dynamic> allVotes = response as List<dynamic>;
-      final Map<String, int> counts = {};
-      for (var vote in allVotes) {
-        final tid = vote['target_id'] as String;
-        counts[tid] = (counts[tid] ?? 0) + 1;
-      }
-
-      final myCount = counts[_targetUserId] ?? 0;
-      int aboveMe = 0;
-      counts.forEach((tid, count) {
-        if (tid != _targetUserId && count > myCount) {
-          aboveMe++;
-        }
-      });
-
-      if (mounted) {
+      if (mounted && response != null && (response as List).isNotEmpty) {
+        final stats = response[0];
         setState(() {
-          _globalRank = aboveMe + 1;
+          _upvotesCount = int.parse(stats['total_votes'].toString());
+          _globalRank = int.parse(stats['global_rank'].toString());
         });
       }
     } catch (e) {
-      debugPrint('Error fetching rank: $e');
+      debugPrint('Error fetching rank via RPC: $e');
     }
   }
 

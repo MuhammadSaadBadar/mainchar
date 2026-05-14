@@ -17,7 +17,7 @@ class AnnouncementsScreen extends StatefulWidget {
 }
 
 class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
-  final AnnouncementController _controller = Get.put(AnnouncementController());
+  final AnnouncementController _controller = Get.find<AnnouncementController>();
   int _selectedIndex = 0;
 
   @override

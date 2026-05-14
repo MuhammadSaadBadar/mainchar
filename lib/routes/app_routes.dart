@@ -16,6 +16,7 @@ abstract class AppRoutes {
   static const String STUDENT_SERVICES = '/student_services';
   static const String VOTES_HISTORY = '/votes_history';
   static const String TERMS = '/terms';
+  static const String REVEAL_ARENA = '/reveal_arena';
 
   // Demo Routes
   static const String DEMO_EXPLORE = '/demo_explore';

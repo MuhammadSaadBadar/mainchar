@@ -18,6 +18,7 @@ import '../screens/demo/demo_votes_history_screen.dart';
 import 'app_routes.dart';
 import '../screens/demo/demo_arena_screen.dart';
 import '../screens/legal/terms_screen.dart';
+import '../screens/votes/reveal_arena_screen.dart';
 
 class AppPages {
   static const INITIAL = AppRoutes.LOGIN;
@@ -88,6 +89,11 @@ class AppPages {
       name: AppRoutes.MY_REQUESTS,
       page: () => const MyRequestsScreen(),
       transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.REVEAL_ARENA,
+      page: () => const RevealArenaScreen(),
+      transition: Transition.zoom,
     ),
 
     // Demo Routes
