@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spline_flutter/spline_flutter.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:mainchar/routes/app_routes.dart';
 import '../../theme/app_theme.dart';
@@ -1128,9 +1127,7 @@ class _SplineBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return const RepaintBoundary(
       child: SizedBox.expand(
-        child: SplineViewer(
-          sceneUrl: 'https://my.spline.design/glassknotvortex-ey66ZMhtArd598uMIwh5aGcg/',
-        ),
+        child: HtmlElementView(viewType: 'spline-view'),
       ),
     );
   }
