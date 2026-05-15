@@ -572,7 +572,7 @@ class _LoginCard extends StatelessWidget {
               const SizedBox(height: 40),
               _FormField(
                 label: 'UNIVERSITY EMAIL',
-                hint: 'name@university.edu',
+                hint: '000000000@student.uol.edu.pk',
                 icon: Icons.alternate_email,
                 controller: emailController,
               ),
