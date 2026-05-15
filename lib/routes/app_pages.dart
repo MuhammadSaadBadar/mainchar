@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
+import 'package:mainchar/screens/announcements/announcements_screen.dart';
+import 'package:mainchar/screens/announcements/my_requests_screen.dart';
+import 'package:mainchar/screens/announcements/request_announcement_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/votes/voting_arena_screen.dart';
 import '../screens/leaderboard_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
-import '../screens/announements/announcements_screen.dart';
-import '../screens/announements/request_announcement_screen.dart';
-import '../screens/announements/my_requests_screen.dart';
 import '../screens/explore_screen.dart';
 import '../screens/admin/admin_screen.dart';
 import '../screens/votes/votes_history_screen.dart';

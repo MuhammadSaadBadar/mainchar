@@ -45,7 +45,7 @@ class UniversityActivities {
   ];
 
   static List<Activity> get all => [...sports, ...societies, ...interests];
-  
+
   static Activity? fromLabel(String label) {
     try {
       return all.firstWhere((a) => a.label == label);

@@ -313,7 +313,7 @@ class _RequestEventScreenState extends State<RequestEventScreen> {
                                           _InputField(
                                             label: "LOCATION",
                                             controller: _locationController,
-                                            hintText: "WHERE ARE WE HEADING?",
+                                            hintText: "WHERE IS THE EVENT ?",
                                             icon: Icons.location_on,
                                           ),
                                           const SizedBox(height: 32),
@@ -435,45 +435,211 @@ class _RequestEventScreenState extends State<RequestEventScreen> {
                                           const SizedBox(height: 48),
                                           ElevatedButton(
                                             onPressed: () async {
-                                              if (_titleController
-                                                      .text
-                                                      .isEmpty ||
-                                                  _selectedCategory.isEmpty) {
-                                                Get.snackbar(
-                                                  "Hold Up",
-                                                  "Title and Category are required!",
-                                                  backgroundColor:
-                                                      Colors.redAccent,
-                                                  colorText: Colors.white,
+                                              // ── Validate all mandatory fields ──
+                                              final missingFields = <String>[];
+                                              if (_titleController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add(
+                                                  'Event Title',
+                                                );
+                                              if (_locationController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add('Location');
+                                              if (_descriptionController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add(
+                                                  'Description',
+                                                );
+                                              if (_dateController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add('Event Date');
+                                              if (_startTimeController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add('Start Time');
+                                              if (_endTimeController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add('End Time');
+                                              if (_rulesController.text
+                                                  .trim()
+                                                  .isEmpty)
+                                                missingFields.add(
+                                                  'Rules & Guidelines',
+                                                );
+                                              if (_selectedCategory.isEmpty)
+                                                missingFields.add('Category');
+
+                                              if (missingFields.isNotEmpty) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (ctx) => AlertDialog(
+                                                    backgroundColor: AppColors
+                                                        .surfaceContainerHigh,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      side: BorderSide(
+                                                        color: Colors.redAccent
+                                                            .withOpacity(0.4),
+                                                        width: 1.5,
+                                                      ),
+                                                    ),
+                                                    title: Row(
+                                                      children: [
+                                                        const Icon(
+                                                          Icons
+                                                              .warning_amber_rounded,
+                                                          color:
+                                                              Colors.redAccent,
+                                                          size: 24,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 12,
+                                                        ),
+                                                        Text(
+                                                          'FILL ALL FIELDS',
+                                                          style:
+                                                              AppTextStyles.label(
+                                                                14,
+                                                                color: Colors
+                                                                    .redAccent,
+                                                                weight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                                letterSpacing:
+                                                                    1.5,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    content: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Please complete the following required fields:',
+                                                          style: AppTextStyles.body(
+                                                            14,
+                                                            color: AppColors
+                                                                .onSurfaceVariant,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 16,
+                                                        ),
+                                                        ...missingFields.map(
+                                                          (field) => Padding(
+                                                            padding:
+                                                                const EdgeInsets.only(
+                                                                  bottom: 8,
+                                                                ),
+                                                            child: Row(
+                                                              children: [
+                                                                Container(
+                                                                  width: 6,
+                                                                  height: 6,
+                                                                  decoration: const BoxDecoration(
+                                                                    color: Colors
+                                                                        .redAccent,
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 10,
+                                                                ),
+                                                                Text(
+                                                                  field,
+                                                                  style: AppTextStyles.label(
+                                                                    13,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    weight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                              ctx,
+                                                            ).pop(),
+                                                        style: TextButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.redAccent
+                                                                  .withOpacity(
+                                                                    0.15,
+                                                                  ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  100,
+                                                                ),
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 24,
+                                                                vertical: 12,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          'GOT IT',
+                                                          style:
+                                                              AppTextStyles.label(
+                                                                12,
+                                                                color: Colors
+                                                                    .redAccent,
+                                                                weight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                                letterSpacing:
+                                                                    1.5,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 );
                                                 return;
                                               }
 
-                                              print("Submission started...");
-                                              print(
-                                                "Title: ${_titleController.text}",
-                                              );
-                                              print(
-                                                "Category: $_selectedCategory",
-                                              );
-
                                               try {
                                                 await _controller.submitRequest(
-                                                  title: _titleController.text,
+                                                  title: _titleController.text
+                                                      .trim(),
                                                   category: _selectedCategory,
                                                   description:
                                                       _descriptionController
-                                                          .text,
-                                                  location:
-                                                      _locationController.text,
-                                                  eventDate:
-                                                      _dateController.text,
+                                                          .text
+                                                          .trim(),
+                                                  location: _locationController
+                                                      .text
+                                                      .trim(),
+                                                  eventDate: _dateController
+                                                      .text
+                                                      .trim(),
                                                   eventTime:
-                                                      "${_startTimeController.text} - ${_endTimeController.text}",
-                                                  rules: _rulesController.text,
+                                                      "${_startTimeController.text.trim()} - ${_endTimeController.text.trim()}",
+                                                  rules: _rulesController.text
+                                                      .trim(),
                                                 );
-
-                                                print("Submission successful!");
 
                                                 Get.snackbar(
                                                   "Success",
@@ -485,7 +651,6 @@ class _RequestEventScreenState extends State<RequestEventScreen> {
                                                       SnackPosition.BOTTOM,
                                                 );
 
-                                                // Small delay for the snackbar to be seen if navigating immediately
                                                 Future.delayed(
                                                   const Duration(seconds: 1),
                                                   () {
@@ -498,7 +663,6 @@ class _RequestEventScreenState extends State<RequestEventScreen> {
                                                   },
                                                 );
                                               } catch (e) {
-                                                print("Submission failed: $e");
                                                 Get.snackbar(
                                                   "Error",
                                                   e.toString(),

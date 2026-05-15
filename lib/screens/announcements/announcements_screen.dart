@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'dart:ui';
+import 'dart:ui_web' as ui;
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:mainchar/routes/app_routes.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/main_header.dart';
@@ -70,134 +73,149 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
       ),
       body: Stack(
         children: [
-          const _GrainOverlay(),
-          Column(
-            children: [
-              const MainHeader(title: "CAMPUS MUSE"),
-              if (MediaQuery.of(context).size.width < 768)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+          const Positioned.fill(
+            child: IgnorePointer(child: _SplineBackground()),
+          ),
+          PointerInterceptor(child: const _GrainOverlay()),
+          PointerInterceptor(
+            child: Column(
+              children: [
+                const MainHeader(title: "CAMPUS MUSE"),
+                if (MediaQuery.of(context).size.width < 768)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: const GlobalTopNav(),
+                    ),
+                  ),
+                Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: const GlobalTopNav(),
-                  ),
-                ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 24.0,
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isDesktop = constraints.maxWidth > 900;
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Left Panel - Timeline
-                          SizedBox(
-                            width: isDesktop ? 320.0 : constraints.maxWidth,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "THE WIRE",
-                                      style: AppTextStyles.headline(
-                                        36,
-                                        weight: FontWeight.w900,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 6.0,
-                                      ),
-                                      child: Text(
-                                        "LIVE UPDATES",
-                                        style: AppTextStyles.label(
-                                          12,
-                                          color: AppColors.secondary,
-                                          letterSpacing: 2,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 24.0,
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isDesktop = constraints.maxWidth > 900;
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left Panel - Timeline
+                            SizedBox(
+                              width: isDesktop ? 320.0 : constraints.maxWidth,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Let's Get Together",
+                                          style: AppTextStyles.headline(
+                                            isDesktop ? 28 : 36,
+                                            weight: FontWeight.w900,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Expanded(
-                                  child: Obx(() {
-                                    if (_controller
-                                        .approvedAnnouncements
-                                        .isEmpty) {
-                                      return const _EmptyWireState();
-                                    }
-                                    return ListView.separated(
-                                      itemCount: _controller
+                                      const SizedBox(width: 8),
+                                      Flexible(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 6.0,
+                                          ),
+                                          child: Text(
+                                            "LIVE UPDATES",
+                                            style: AppTextStyles.label(
+                                              12,
+                                              color: AppColors.secondary,
+                                              letterSpacing: 2,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Expanded(
+                                    child: Obx(() {
+                                      if (_controller
                                           .approvedAnnouncements
-                                          .length,
-                                      separatorBuilder: (_, __) =>
-                                          const SizedBox(height: 16),
-                                      itemBuilder: (context, index) {
-                                        final item = _controller
-                                            .approvedAnnouncements[index];
-                                        final isSelected =
-                                            isDesktop &&
-                                            _selectedIndex == index;
-                                        return _AnnouncementTile(
-                                          announcement: item,
-                                          isSelected: isSelected,
-                                          onTap: () {
-                                            setState(
-                                              () => _selectedIndex = index,
-                                            );
-                                            if (!isDesktop) {
-                                              Get.bottomSheet(
-                                                _MobileDetailSheet(
-                                                  announcement: item,
-                                                ),
-                                                isScrollControlled: true,
+                                          .isEmpty) {
+                                        return const _EmptyWireState();
+                                      }
+                                      return ListView.separated(
+                                        itemCount: _controller
+                                            .approvedAnnouncements
+                                            .length,
+                                        separatorBuilder: (_, __) =>
+                                            const SizedBox(height: 16),
+                                        itemBuilder: (context, index) {
+                                          final item = _controller
+                                              .approvedAnnouncements[index];
+                                          final isSelected =
+                                              isDesktop &&
+                                              _selectedIndex == index;
+                                          return _AnnouncementTile(
+                                            announcement: item,
+                                            isSelected: isSelected,
+                                            onTap: () {
+                                              setState(
+                                                () => _selectedIndex = index,
                                               );
-                                            }
-                                          },
-                                        );
-                                      },
-                                    );
-                                  }),
-                                ),
-                              ],
+                                              if (!isDesktop) {
+                                                Get.bottomSheet(
+                                                  _MobileDetailSheet(
+                                                    announcement: item,
+                                                  ),
+                                                  isScrollControlled: true,
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isDesktop) ...[
-                            const SizedBox(width: 24),
-                            // Right Panel - Detail View
-                            Expanded(
-                              child: Obx(() {
-                                if (_controller.approvedAnnouncements.isEmpty) {
-                                  return const SizedBox();
-                                }
-                                if (_selectedIndex >=
-                                    _controller.approvedAnnouncements.length) {
-                                  _selectedIndex = 0;
-                                }
-                                return _DetailView(
-                                  announcement: _controller
-                                      .approvedAnnouncements[_selectedIndex],
-                                );
-                              }),
-                            ),
+                            if (isDesktop) ...[
+                              const SizedBox(width: 24),
+                              // Right Panel - Detail View
+                              Expanded(
+                                child: Obx(() {
+                                  if (_controller
+                                      .approvedAnnouncements
+                                      .isEmpty) {
+                                    return const SizedBox();
+                                  }
+                                  if (_selectedIndex >=
+                                      _controller
+                                          .approvedAnnouncements
+                                          .length) {
+                                    _selectedIndex = 0;
+                                  }
+                                  return _DetailView(
+                                    announcement: _controller
+                                        .approvedAnnouncements[_selectedIndex],
+                                  );
+                                }),
+                              ),
+                            ],
                           ],
-                        ],
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -274,6 +292,56 @@ class _AnnouncementTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (announcement.location.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          size: 11,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            announcement.location,
+                            style: AppTextStyles.label(
+                              10,
+                              color: AppColors.primary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (announcement.eventDate.isNotEmpty ||
+                      announcement.eventTime.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.schedule,
+                          size: 11,
+                          color: AppColors.secondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            [
+                              announcement.eventDate,
+                              announcement.eventTime,
+                            ].where((s) => s.isNotEmpty).join('  •  '),
+                            style: AppTextStyles.label(
+                              10,
+                              color: AppColors.secondary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,14 +357,10 @@ class _AnnouncementTile extends StatelessWidget {
                               .difference(announcement.createdAt)
                               .inHours <
                           24)
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.bolt,
-                              color: AppColors.secondary,
-                              size: 14,
-                            ),
-                          ],
+                        const Icon(
+                          Icons.bolt,
+                          color: AppColors.secondary,
+                          size: 14,
                         ),
                     ],
                   ),
@@ -407,12 +471,16 @@ class _DetailView extends StatelessWidget {
                         ),
                       ),
                       if (announcement.location.isNotEmpty ||
+                          announcement.eventDate.isNotEmpty ||
                           announcement.eventTime.isNotEmpty) ...[
                         const SizedBox(height: 32),
-                        Row(
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
                           children: [
                             if (announcement.location.isNotEmpty)
-                              Expanded(
+                              SizedBox(
+                                width: double.infinity,
                                 child: _InfoBox(
                                   icon: Icons.location_on,
                                   iconColor: AppColors.primary,
@@ -420,17 +488,19 @@ class _DetailView extends StatelessWidget {
                                   value: announcement.location,
                                 ),
                               ),
-                            if (announcement.location.isNotEmpty &&
-                                announcement.eventTime.isNotEmpty)
-                              const SizedBox(width: 16),
+                            if (announcement.eventDate.isNotEmpty)
+                              _InfoBox(
+                                icon: Icons.calendar_today,
+                                iconColor: AppColors.secondary,
+                                label: "DATE",
+                                value: announcement.eventDate,
+                              ),
                             if (announcement.eventTime.isNotEmpty)
-                              Expanded(
-                                child: _InfoBox(
-                                  icon: Icons.schedule,
-                                  iconColor: AppColors.secondary,
-                                  label: "TIME",
-                                  value: announcement.eventTime,
-                                ),
+                              _InfoBox(
+                                icon: Icons.schedule,
+                                iconColor: AppColors.secondary,
+                                label: "TIME",
+                                value: announcement.eventTime,
                               ),
                           ],
                         ),
@@ -542,6 +612,15 @@ class _MobileDetailSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                     ],
+                    if (announcement.eventDate.isNotEmpty) ...[
+                      _InfoBox(
+                        icon: Icons.calendar_today,
+                        iconColor: AppColors.secondary,
+                        label: "DATE",
+                        value: announcement.eventDate,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     if (announcement.eventTime.isNotEmpty) ...[
                       _InfoBox(
                         icon: Icons.schedule,
@@ -549,7 +628,7 @@ class _MobileDetailSheet extends StatelessWidget {
                         label: "TIME",
                         value: announcement.eventTime,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
                     ],
                     if (announcement.rules.isNotEmpty) ...[
                       _RulesBlock(rules: announcement.rules),
@@ -699,21 +778,9 @@ class _EmptyWireStateState extends State<_EmptyWireState>
 
   // ── Items: emoji · label · accent colour ─────────────────────────────────
   static const _items = [
-    (
-      emoji: '🎸',
-      label: 'MUSIC & CULTURE',
-      color: Color(0xFFD394FF),
-    ),
-    (
-      emoji: '🏏',
-      label: 'SPORTS & CLUBS',
-      color: Color(0xFFC3F400),
-    ),
-    (
-      emoji: '⚽',
-      label: 'EVENTS & FESTS',
-      color: Color(0xFF00F4FE),
-    ),
+    (emoji: '🎸', label: 'MUSIC & CULTURE', color: Color(0xFFD394FF)),
+    (emoji: '🏏', label: 'SPORTS & CLUBS', color: Color(0xFFC3F400)),
+    (emoji: '⚽', label: 'EVENTS & FESTS', color: Color(0xFF00F4FE)),
   ];
 
   // ── Init ─────────────────────────────────────────────────────────────────
@@ -726,28 +793,27 @@ class _EmptyWireStateState extends State<_EmptyWireState>
       duration: const Duration(milliseconds: 2200),
       vsync: this,
     )..repeat(reverse: true);
-    _floatAnim = Tween<double>(begin: -12, end: 12).animate(
-      CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut),
-    );
+    _floatAnim = Tween<double>(
+      begin: -12,
+      end: 12,
+    ).animate(CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut));
 
     // Pulsing glow intensity
     _glowCtrl = AnimationController(
       duration: const Duration(milliseconds: 1600),
       vsync: this,
     )..repeat(reverse: true);
-    _glowAnim = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _glowCtrl, curve: Curves.easeInOut),
-    );
+    _glowAnim = Tween<double>(
+      begin: 0.3,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _glowCtrl, curve: Curves.easeInOut));
 
     // Y-axis 3-D flip (0 → 1 maps to 0 → π)
     _flipCtrl = AnimationController(
       duration: const Duration(milliseconds: 700),
       vsync: this,
     );
-    _flipAnim = CurvedAnimation(
-      parent: _flipCtrl,
-      curve: Curves.easeInOut,
-    );
+    _flipAnim = CurvedAnimation(parent: _flipCtrl, curve: Curves.easeInOut);
 
     _flipCtrl.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -798,8 +864,9 @@ class _EmptyWireStateState extends State<_EmptyWireState>
                 // During the second half we show the NEXT item's colour/emoji
                 // but at a mirrored angle so it appears to "unwrap" from 90°
                 final nextIndex = (_currentIndex + 1) % _items.length;
-                final visibleItem =
-                    isFirstHalf ? _items[_currentIndex] : _items[nextIndex];
+                final visibleItem = isFirstHalf
+                    ? _items[_currentIndex]
+                    : _items[nextIndex];
                 // Remap angle so second half runs from π/2 back toward 0
                 final displayAngle = isFirstHalf ? flipAngle : flipAngle - pi;
 
@@ -818,8 +885,9 @@ class _EmptyWireStateState extends State<_EmptyWireState>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: accentColor
-                                  .withOpacity(_glowAnim.value * 0.35),
+                              color: accentColor.withOpacity(
+                                _glowAnim.value * 0.35,
+                              ),
                               blurRadius: 80,
                               spreadRadius: 30,
                             ),
@@ -975,7 +1043,7 @@ class _EmptyWireStateState extends State<_EmptyWireState>
             const SizedBox(height: 16),
 
             Text(
-              'THE WIRE IS QUIET',
+              'NO LIVE ANNOUNCEMENTS',
               style: AppTextStyles.headline(
                 18,
                 weight: FontWeight.w900,
@@ -1047,5 +1115,42 @@ class _GrainOverlay extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Spline 3D Background
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SplineBackground extends StatefulWidget {
+  const _SplineBackground();
+
+  @override
+  State<_SplineBackground> createState() => _SplineBackgroundState();
+}
+
+class _SplineBackgroundState extends State<_SplineBackground> {
+  final String viewId = 'spline-view';
+
+  @override
+  void initState() {
+    super.initState();
+
+    ui.platformViewRegistry.registerViewFactory(viewId, (int id) {
+      final iframe = html.IFrameElement()
+        ..src =
+            'https://my.spline.design/glassknotvortex-ey66ZMhtArd598uMIwh5aGcg/'
+        ..style.border = 'none'
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..allowFullscreen = true;
+
+      return iframe;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const HtmlElementView(viewType: 'spline-view');
   }
 }
