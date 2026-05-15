@@ -1,7 +1,4 @@
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
-import 'dart:ui_web' as ui_web;
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get/get.dart';
@@ -16,21 +13,6 @@ import 'controllers/announcement_controller.dart';
 void main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  
-  if (kIsWeb) {
-    // Register the Spline View Factory once globally
-    // ignore: undefined_prefixed_name
-    ui_web.platformViewRegistry.registerViewFactory('spline-view', (int id) {
-      final iframe = html.IFrameElement()
-        ..src = 'https://my.spline.design/glassknotvortex-ey66ZMhtArd598uMIwh5aGcg/'
-        ..style.border = 'none'
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.overflow = 'hidden'
-        ..allowFullscreen = true;
-      return iframe;
-    });
-  }
 
   // These will use Vercel variables if present, or fallback to your keys for local testing
   const supabaseUrl = String.fromEnvironment(
