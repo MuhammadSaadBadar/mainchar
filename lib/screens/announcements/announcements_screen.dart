@@ -1,9 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
-import 'dart:ui_web' as ui;
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:spline_flutter/spline_flutter.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:mainchar/routes/app_routes.dart';
 import '../../theme/app_theme.dart';
@@ -1122,35 +1121,17 @@ class _GrainOverlay extends StatelessWidget {
 // Spline 3D Background
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SplineBackground extends StatefulWidget {
+class _SplineBackground extends StatelessWidget {
   const _SplineBackground();
 
   @override
-  State<_SplineBackground> createState() => _SplineBackgroundState();
-}
-
-class _SplineBackgroundState extends State<_SplineBackground> {
-  final String viewId = 'spline-view';
-
-  @override
-  void initState() {
-    super.initState();
-
-    ui.platformViewRegistry.registerViewFactory(viewId, (int id) {
-      final iframe = html.IFrameElement()
-        ..src =
-            'https://my.spline.design/glassknotvortex-ey66ZMhtArd598uMIwh5aGcg/'
-        ..style.border = 'none'
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..allowFullscreen = true;
-
-      return iframe;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return const HtmlElementView(viewType: 'spline-view');
+    return const RepaintBoundary(
+      child: SizedBox.expand(
+        child: SplineViewer(
+          sceneUrl: 'https://my.spline.design/glassknotvortex-ey66ZMhtArd598uMIwh5aGcg/',
+        ),
+      ),
+    );
   }
 }
