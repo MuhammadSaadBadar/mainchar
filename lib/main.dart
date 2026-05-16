@@ -1,8 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
-import 'dart:ui_web' as ui_web;
-import 'dart:js_interop';
-import 'dart:js_interop_unsafe';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get/get.dart';
@@ -14,32 +11,9 @@ import 'routes/app_pages.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/announcement_controller.dart';
 
-@JS('document.createElement')
-external JSObject documentCreateElement(String tag);
-
 void main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-
-  if (kIsWeb) {
-    // WASM-safe view registration without dart:html
-    // ignore: undefined_prefixed_name
-    ui_web.platformViewRegistry.registerViewFactory('spline-view', (int id) {
-      final iframe = documentCreateElement('iframe');
-      iframe.setProperty('src'.toJS, 'spline.html'.toJS);
-
-      iframe.setProperty('allowFullscreen'.toJS, true.toJS);
-
-      final style = iframe.getProperty('style'.toJS) as JSObject;
-      style.setProperty('border'.toJS, 'none'.toJS);
-      style.setProperty('width'.toJS, '100%'.toJS);
-      style.setProperty('height'.toJS, '100%'.toJS);
-      style.setProperty('overflow'.toJS, 'hidden'.toJS);
-      style.setProperty('pointer-events'.toJS, 'auto'.toJS);
-
-      return iframe as Object;
-    });
-  }
 
   // These will use Vercel variables if present, or fallback to your keys for local testing
   const supabaseUrl = String.fromEnvironment(
