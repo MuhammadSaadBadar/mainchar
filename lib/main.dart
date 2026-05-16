@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,37 +13,60 @@ import 'controllers/auth_controller.dart';
 import 'controllers/announcement_controller.dart';
 
 void main() async {
-  usePathUrlStrategy();
-  WidgetsFlutterBinding.ensureInitialized();
+  // Use runZonedGuarded to catch all unhandled errors in the app
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    usePathUrlStrategy();
 
-  // These will use Vercel variables if present, or fallback to your keys for local testing
-  const supabaseUrl = String.fromEnvironment(
-    'SUPABASE_URL',
-    defaultValue: 'https://bjzwaikdkyvgzamswtqe.supabase.co',
-  );
-  const supabaseKey = String.fromEnvironment(
-    'SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqendhaWtka3l2Z3phbXN3dHFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NzgzOTgsImV4cCI6MjA5MDU1NDM5OH0.QZtEzk1wEqp4P_mgB2O22Ibfnk5B-oUnN1a8eenbASU',
-  );
+    debugPrint('App Initializing...');
 
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+    // Setup basic error handling early
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('Flutter Error: ${details.exception}');
+    };
 
-  // Ensure Google Fonts can be fetched at runtime
-  GoogleFonts.config.allowRuntimeFetching = true;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      debugPrint('Platform Error: $error');
+      // If it's a Google Fonts error, we can ignore it as it fallbacks to system fonts
+      if (stack.toString().contains('google_fonts')) {
+        return true;
+      }
+      return false;
+    };
 
-  // Catch isolated Google Fonts network/loading errors to prevent app crashes.
-  // When `allowRuntimeFetching` is true, a network error produces an unhandled
-  // async exception safely ignored here, allowing a graceful fallback to system fonts.
-  PlatformDispatcher.instance.onError = (error, stack) {
-    if (stack.toString().contains('google_fonts')) {
-      debugPrint('Google Fonts failed to load: $error');
-      return true; // Prevents the app from crashing
+    // These will use Vercel variables if present, or fallback to your keys for local testing
+    const supabaseUrl = String.fromEnvironment(
+      'SUPABASE_URL',
+      defaultValue: 'https://bjzwaikdkyvgzamswtqe.supabase.co',
+    );
+    const supabaseKey = String.fromEnvironment(
+      'SUPABASE_ANON_KEY',
+      defaultValue:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqendhaWtka3l2Z3phbXN3dHFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NzgzOTgsImV4cCI6MjA5MDU1NDM5OH0.QZtEzk1wEqp4P_mgB2O22Ibfnk5B-oUnN1a8eenbASU',
+    );
+
+    try {
+      debugPrint('Initializing Supabase...');
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseKey,
+        debug: kDebugMode,
+      );
+      debugPrint('Supabase Initialized Successfully');
+    } catch (e) {
+      debugPrint('Supabase Initialization Error: $e');
+      // Even if Supabase fails, we might want to run the app to show an error screen
     }
-    return false;
-  };
 
-  runApp(const MainCharApp());
+    // Ensure Google Fonts can be fetched at runtime
+    GoogleFonts.config.allowRuntimeFetching = true;
+
+    runApp(const MainCharApp());
+  }, (error, stack) {
+    debugPrint('Critical Unhandled Error: $error');
+    debugPrint(stack.toString());
+  });
 }
 
 class MainCharApp extends StatelessWidget {
