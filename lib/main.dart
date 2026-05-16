@@ -20,22 +20,25 @@ external JSObject documentCreateElement(String tag);
 void main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   if (kIsWeb) {
     // WASM-safe view registration without dart:html
     // ignore: undefined_prefixed_name
     ui_web.platformViewRegistry.registerViewFactory('spline-view', (int id) {
       final iframe = documentCreateElement('iframe');
-      iframe.setProperty('src'.toJS, 'https://my.spline.design/datatransfer-TAxIm5v54MzBP0hpv2RKIqfh/'.toJS);
+      iframe.setProperty(
+        'src'.toJS,
+        'https://prod.spline.design/qhUH8QYFQZYl6zvq/scene.splinecode'.toJS,
+      );
       iframe.setProperty('allowFullscreen'.toJS, true.toJS);
-      
+
       final style = iframe.getProperty('style'.toJS) as JSObject;
       style.setProperty('border'.toJS, 'none'.toJS);
       style.setProperty('width'.toJS, '100%'.toJS);
       style.setProperty('height'.toJS, '100%'.toJS);
       style.setProperty('overflow'.toJS, 'hidden'.toJS);
       style.setProperty('pointer-events'.toJS, 'auto'.toJS);
-      
+
       return iframe as Object;
     });
   }
