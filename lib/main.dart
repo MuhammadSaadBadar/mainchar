@@ -26,10 +26,8 @@ void main() async {
     // ignore: undefined_prefixed_name
     ui_web.platformViewRegistry.registerViewFactory('spline-view', (int id) {
       final iframe = documentCreateElement('iframe');
-      iframe.setProperty(
-        'src'.toJS,
-        'https://prod.spline.design/qhUH8QYFQZYl6zvq/scene.splinecode'.toJS,
-      );
+      iframe.setProperty('src'.toJS, 'spline.html'.toJS);
+
       iframe.setProperty('allowFullscreen'.toJS, true.toJS);
 
       final style = iframe.getProperty('style'.toJS) as JSObject;
