@@ -1,14 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="/">
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Inside UoL - The social pulse of your campus.">
+  
+  <!-- Primary Meta Tags -->
+  <title>Inside UoL | The Official Student Community Platform</title>
+  <meta name="google-site-verification" content="RqGzLsGx5JZfuXDr7KkOYrsNZWuXleREdTT-4M5_USs" />
+  <meta name="title" content="Inside UoL | The Official Student Community Platform">
+  <meta name="description" content="Join Inside UoL, the official student community platform for UoL. Connect, share, and stay updated with everything happening on campus.">
+  <meta name="keywords" content="UoL, University of Lahore, Student Community, Inside UoL, Student Platform">
+  <meta name="author" content="Inside UoL Team">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#D394FF">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://insideuol.vercel.app/">
+  <meta property="og:title" content="Inside UoL | The Official Student Community Platform">
+  <meta property="og:description" content="Join Inside UoL, the official student community platform for UoL. Connect, share, and stay updated with everything happening on campus.">
+  <meta property="og:image" content="https://insideuol.vercel.app/icons/Icon-512.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://insideuol.vercel.app/">
+  <meta property="twitter:title" content="Inside UoL | The Official Student Community Platform">
+  <meta property="twitter:description" content="Join Inside UoL, the official student community platform for UoL. Connect, share, and stay updated with everything happening on campus.">
+  <meta property="twitter:image" content="https://insideuol.vercel.app/icons/Icon-512.png">
+
+  <!-- Canonical Link -->
+  <link rel="canonical" href="https://insideuol.vercel.app/">
 
   <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Inside UoL">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
@@ -16,84 +55,9 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>Inside UoL</title>
   <link rel="manifest" href="manifest.json">
-
-  <style>
-    body {
-      background-color: #0E0E0E;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      font-family: sans-serif;
-      color: white;
-    }
-    .loading-container {
-      text-align: center;
-    }
-    .loader {
-      border: 4px solid #1A1A1A;
-      border-top: 4px solid #D394FF;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    #error-log {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      background: rgba(255, 0, 0, 0.1);
-      color: #ff6e84;
-      padding: 15px;
-      border-radius: 8px;
-      display: none;
-      font-size: 12px;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid rgba(255, 0, 0, 0.3);
-      z-index: 9999;
-    }
-  </style>
-
-  <script>
-    // Global error handler to catch "white screen" causes
-    window.onerror = function(message, source, lineno, colno, error) {
-      const errorLog = document.getElementById('error-log');
-      if (errorLog) {
-        errorLog.style.display = 'block';
-        errorLog.innerHTML += '<div>' + message + ' (at ' + source + ':' + lineno + ')</div>';
-      }
-      return false;
-    };
-    window.onunhandledrejection = function(event) {
-      const errorLog = document.getElementById('error-log');
-      if (errorLog) {
-        errorLog.style.display = 'block';
-        errorLog.innerHTML += '<div>Promise Rejection: ' + event.reason + '</div>';
-      }
-    };
-  </script>
 </head>
 <body>
-  <div class="loading-container" id="loading-indicator">
-    <div class="loader"></div>
-    <div style="letter-spacing: 2px; font-weight: bold; font-size: 12px;">LOADING VIBE...</div>
-  </div>
-
-  <div id="error-log"></div>
-
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
